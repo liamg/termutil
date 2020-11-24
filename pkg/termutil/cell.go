@@ -1,5 +1,7 @@
 package termutil
 
+import "image/color"
+
 type Cell struct {
 	r    MeasuredRune
 	attr CellAttributes
@@ -13,21 +15,21 @@ func (cell *Cell) Rune() MeasuredRune {
 	return cell.r
 }
 
-func (cell *Cell) Fg() Colour {
+func (cell *Cell) Fg() color.Color {
 	if cell.Attr().inverse {
 		return cell.attr.bgColour
 	}
 	return cell.attr.fgColour
 }
 
-func (cell *Cell) Bg() Colour {
+func (cell *Cell) Bg() color.Color {
 	if cell.Attr().inverse {
 		return cell.attr.fgColour
 	}
 	return cell.attr.bgColour
 }
 
-func (cell *Cell) erase(bgColour Colour) {
+func (cell *Cell) erase(bgColour color.Color) {
 	cell.setRune(MeasuredRune{Rune: 0})
 	cell.attr.bgColour = bgColour
 }

@@ -18,7 +18,7 @@ const (
 	InternalBuffer uint8 = 2
 )
 
-// Terminal communicates with the underlying terminal which is running shox
+// Terminal communicates with the underlying terminal
 type Terminal struct {
 	pty          *os.File
 	updateChan   chan struct{}
@@ -28,6 +28,7 @@ type Terminal struct {
 	activeBuffer *Buffer
 	title        string
 	logFile      *os.File
+	theme        *Theme
 }
 
 // NewTerminal creates a new terminal instance
@@ -35,6 +36,7 @@ func New(options ...Option) *Terminal {
 	term := &Terminal{
 		processChan: make(chan MeasuredRune, 0xffff),
 		closeChan:   make(chan struct{}),
+		theme:       &DefaultTheme,
 	}
 	term.buffers = []*Buffer{
 		NewBuffer(1, 1, 0xffff),
@@ -205,7 +207,7 @@ func (t *Terminal) processRunes(runes ...MeasuredRune) (renderRequired bool) {
 				// TODO handle any other control chars here
 				continue
 			}
-			
+
 			t.GetActiveBuffer().write(t.translateRune(r))
 			renderRequired = true
 		}

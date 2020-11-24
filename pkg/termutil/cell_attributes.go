@@ -1,10 +1,13 @@
 package termutil
 
-import "strings"
+import (
+	"image/color"
+	"strings"
+)
 
 type CellAttributes struct {
-	fgColour  Colour
-	bgColour  Colour
+	fgColour  color.Color
+	bgColour  color.Color
 	bold      bool
 	dim       bool
 	underline bool
@@ -21,33 +24,21 @@ func (cellAttr *CellAttributes) reverseVideo() {
 
 // GetDiffANSI takes a previous cell attribute set and diffs to this one, producing the
 // most efficient ANSI output to achieve the diff
-func (cellAttr CellAttributes) GetDiffANSI(prev CellAttributes) string {
+func (cellAttr CellAttributes) GetDiffANSI(theme *Theme, prev CellAttributes) string {
 
 	var segments []string
 
 	// set fg
 	if prev.fgColour != cellAttr.fgColour {
-		if cellAttr.fgColour == "" {
-			segments = append(segments, "39")
-		} else {
-			segments = append(segments, string(cellAttr.fgColour))
-		}
+		segments = append(segments, theme.ColourToANSI(cellAttr.fgColour, false))
 	}
 
 	// set bg
 	if prev.bgColour != cellAttr.bgColour {
-		if cellAttr.bgColour == "" {
-			segments = append(segments, "49")
-		} else {
-			segments = append(segments, string(cellAttr.bgColour))
-		}
+		segments = append(segments, theme.ColourToANSI(cellAttr.bgColour, true))
 	}
 
 	// TODO add sequences for bold, dim, blink etc. diffs
 
-	if len(segments) == 0 {
-		return ""
-	}
-
-	return "\x1b[" + strings.Join(segments, ";") + "m"
+	return strings.Join(segments, "")
 }

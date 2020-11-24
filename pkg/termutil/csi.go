@@ -771,19 +771,20 @@ func (t *Terminal) sgrSequenceHandler(params []string) bool {
 		case "29":
 			// not strikethrough
 		case "38": // set foreground
-			t.GetActiveBuffer().getCursorAttr().fgColour = Colour(p + ";" + strings.Join(params[i:], ";"))
+			t.GetActiveBuffer().getCursorAttr().fgColour, _ = t.theme.ColourFromAnsi(params[i:], false)
 		case "48": // set background
-			t.GetActiveBuffer().getCursorAttr().bgColour = Colour(p + ";" + strings.Join(params[i:], ";"))
+			t.GetActiveBuffer().getCursorAttr().bgColour, _ = t.theme.ColourFromAnsi(params[i:], true)
 		default:
-			i, err := strconv.Atoi(p)
+			bi, err := strconv.Atoi(p)
 			if err != nil {
 				return false
 			}
+			i := byte(bi)
 			switch true {
 			case i >= 30 && i <= 37, i >= 90 && i <= 97, i == 39:
-				t.GetActiveBuffer().getCursorAttr().fgColour = Colour(p)
+				t.GetActiveBuffer().getCursorAttr().fgColour = t.theme.ColourFrom4Bit(i)
 			case i >= 40 && i <= 47, i >= 100 && i <= 107, i == 49:
-				t.GetActiveBuffer().getCursorAttr().bgColour = Colour(p)
+				t.GetActiveBuffer().getCursorAttr().bgColour = t.theme.ColourFrom4Bit(i)
 			}
 
 		}

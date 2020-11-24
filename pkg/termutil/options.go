@@ -9,3 +9,9 @@ func WithLogFile(path string) Option {
 		t.logFile, _ = os.Create(path)
 	}
 }
+
+func WithTheme(theme *Theme) Option {
+	return func(t *Terminal) {
+		t.theme = theme
+	}
+}
